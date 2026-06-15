@@ -2,6 +2,7 @@ import pc from "picocolors";
 import type { ToolCall } from "../adapters";
 import type { CaseResult } from "../runner";
 import type { AssertionResult } from "../scoring";
+import type { LintFinding } from "../client";
 
 export interface ReportOptions {
   title?: string;
@@ -128,4 +129,13 @@ export function diffSubset(expected: unknown, actual: unknown, path = ""): Misma
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function formatLint(findings: LintFinding[]): string {
+  if (findings.length === 0) return "";
+  const lines = ["", pc.bold(pc.yellow(`schema-lint · ${findings.length} warning${findings.length === 1 ? "" : "s"}`)), ""];
+  for (const f of findings) {
+    lines.push(`  ${pc.yellow("⚠")} ${pc.cyan(f.tool)} ${pc.dim(`[${f.rule}]`)} ${f.message}`);
+  }
+  return lines.join("\n");
 }

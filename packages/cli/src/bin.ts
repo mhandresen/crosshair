@@ -7,8 +7,9 @@ const cli = cac("crosshair");
 
 cli
   .command("run [serverCommand] [...serverArgs]", "Run your crosshair.config cases against an MCP server")
-  .action((serverCommand: string | undefined, serverArgs: string[]) =>
-    runCommand({ serverCommand, serverArgs }),
+  .option("--strict", "Treat schema-lint warnings as failures (non-zero exit)")
+  .action((serverCommand: string | undefined, serverArgs: string[], options: { strict?: boolean }) =>
+    runCommand({ serverCommand, serverArgs, strict: options.strict }),
   );
 
 cli.help();

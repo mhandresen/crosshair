@@ -1,2 +1,3 @@
 export { type ConnectedClient, connect, type ServerConfig } from "./connect";
-export { discover, type DiscoveredTool } from "./discover";
+export { type DiscoveredTool, discover } from "./discover";
+export { type LintFinding, type LintSeverity, lintTools } from "./schema-lint";
