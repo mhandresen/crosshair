@@ -1,4 +1,11 @@
-export { type Case, type CaseResult, defineCase, runCase } from "./run-case";
+export {
+  type Case,
+  type CaseResult,
+  buildRequest,
+  defineCase,
+  runCase,
+  scoreCompletion,
+} from "./run-case";
 export {
   type SampledCaseResult,
   type SamplingPolicy,

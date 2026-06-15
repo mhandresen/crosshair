@@ -1,6 +1,9 @@
 import {
   AnthropicAdapter,
   type CrosshairConfig,
+  FileResponseCache,
+  type ResponseCache,
+  type SampledCaseResult,
   connect,
   discover,
   formatLint,
@@ -9,7 +12,6 @@ import {
   loadCrosshairConfig,
   resolvePolicy,
   runSampledCase,
-  type SampledCaseResult,
 } from "@crosshair/core";
 import pc from "picocolors";
 
@@ -17,12 +19,14 @@ export interface RunOptions {
   serverCommand?: string;
   serverArgs?: string[];
   strict?: boolean;
+  cache?: boolean;
 }
 
 export async function runCommand(options: RunOptions): Promise<void> {
   const { config, filepath } = await loadCrosshairConfig();
   console.log(pc.dim(`config: ${filepath}`));
 
+  const cache: ResponseCache | undefined = options.cache === false ? undefined : new FileResponseCache();
   const connection = await connect(resolveServer(config, options));
   try {
     const tools = await discover(connection.client);
@@ -35,10 +39,13 @@ export async function runCommand(options: RunOptions): Promise<void> {
     const results: SampledCaseResult[] = [];
     for (const testCase of config.cases) {
       const policy = resolvePolicy(config.sampling, testCase.sampling);
-      results.push(await runSampledCase(adapter, tools, testCase, policy));
+      results.push(await runSampledCase(adapter, tools, testCase, policy, cache));
     }
 
     console.log(formatSampledReport(results, { title: adapter.model }));
+
+    const cachedTotal = results.reduce((n, r) => n + r.cached, 0);
+    if (cache && cachedTotal > 0) console.log(pc.dim(`${cachedTotal} response(s) served from cache\n`));
 
     const casesFailed = results.some((r) => !r.passed);
     const lintFailed = options.strict === true && findings.length > 0;

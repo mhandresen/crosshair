@@ -1,4 +1,5 @@
 export * from "./adapters";
+export * from "./cache";
 export * from "./client";
 export * from "./config";
 export * from "./report";

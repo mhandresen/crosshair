@@ -1,7 +1,8 @@
-import type { ModelAdapter } from "../adapters";
+import type { CompletionRequest, CompletionResult, ModelAdapter } from "../adapters";
+import { type ResponseCache, requestCacheKey } from "../cache";
 import type { DiscoveredTool } from "../client";
 import { DEFAULT_SAMPLES, DEFAULT_THRESHOLD } from "../config/schema";
-import { type Case, type CaseResult, runCase } from "./run-case";
+import { type Case, type CaseResult, buildRequest, scoreCompletion } from "./run-case";
 
 export interface SamplingPolicy {
   samples: number;
@@ -14,7 +15,7 @@ export interface SampledCaseResult {
   passes: number;
   samples: number;
   threshold: number;
-  // Every run kept, so a flaky case can show its failing samples in the report.
+  cached: number; // how many of the N samples were served from cache
   runs: CaseResult[];
 }
 
@@ -33,21 +34,44 @@ export async function runSampledCase(
   tools: DiscoveredTool[],
   testCase: Case,
   policy: SamplingPolicy,
+  cache?: ResponseCache,
 ): Promise<SampledCaseResult> {
-  const runs: CaseResult[] = [];
-  for (let i = 0; i < policy.samples; i++) {
-    // Sequential for now; concurrency + backoff is the next slice. Caching will
-    // make repeat samples of an unchanged case effectively free.
-    runs.push(await runCase(adapter, tools, testCase));
-  }
-
+  const request = buildRequest(tools, testCase);
+  const { completions, cached } = await sampleCompletions(adapter, request, policy.samples, cache);
+  const runs = completions.map((completion) => scoreCompletion(testCase, completion));
   const passes = runs.filter((run) => run.passed).length;
+
   return {
     name: testCase.name,
     passed: passes >= policy.threshold,
     passes,
     samples: policy.samples,
     threshold: policy.threshold,
+    cached,
     runs,
   };
+}
+
+async function sampleCompletions(
+  adapter: ModelAdapter,
+  request: CompletionRequest,
+  samples: number,
+  cache?: ResponseCache,
+): Promise<{ completions: CompletionResult[]; cached: number }> {
+  const key = cache ? requestCacheKey(adapter, request) : undefined;
+  const existing = cache && key ? cache.get(key) ?? [] : [];
+  const results = [...existing];
+
+  // Only draw the shortfall — a cache with 3 draws and a request for 5 makes 2 calls.
+  while (results.length < samples) {
+    results.push(stripRaw(await adapter.complete(request)));
+  }
+  if (cache && key && results.length > existing.length) cache.set(key, results);
+
+  return { completions: results.slice(0, samples), cached: Math.min(existing.length, samples) };
+}
+
+// The provider's native payload is huge and only useful live; never persist it.
+function stripRaw(result: CompletionResult): CompletionResult {
+  return { toolCalls: result.toolCalls, text: result.text, stopReason: result.stopReason };
 }

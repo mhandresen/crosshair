@@ -1,4 +1,4 @@
-import type { ModelAdapter, ToolCall } from "../adapters";
+import type { CompletionRequest, CompletionResult, ModelAdapter, ToolCall } from "../adapters";
 import type { DiscoveredTool } from "../client";
 import { type Assertion, type AssertionResult, scoreCase } from "../scoring";
 
@@ -22,21 +22,19 @@ export function defineCase(testCase: Case): Case {
   return testCase;
 }
 
-export async function runCase(
-  adapter: ModelAdapter,
-  tools: DiscoveredTool[],
-  testCase: Case,
-): Promise<CaseResult> {
-  const result = await adapter.complete({
+export function buildRequest(tools: DiscoveredTool[], testCase: Case): CompletionRequest {
+  return {
     system: testCase.system,
     messages: [{ role: "user", content: testCase.prompt }],
     tools,
-    // Sampling + threshold land in Phase 3; for now, run once, deterministically.
+    // Temperature 0 measures the model's *preferred* choice; sampling then measures
+    // how stable that preference is (temp 0 is not fully deterministic on LLM APIs).
     temperature: 0,
-  });
+  };
+}
 
+export function scoreCompletion(testCase: Case, result: CompletionResult): CaseResult {
   const assertions = scoreCase(result, testCase.assertions);
-
   return {
     name: testCase.name,
     passed: assertions.every((assertion) => assertion.passed),
@@ -44,4 +42,12 @@ export async function runCase(
     text: result.text,
     assertions,
   };
+}
+
+export async function runCase(
+  adapter: ModelAdapter,
+  tools: DiscoveredTool[],
+  testCase: Case,
+): Promise<CaseResult> {
+  return scoreCompletion(testCase, await adapter.complete(buildRequest(tools, testCase)));
 }

@@ -8,8 +8,9 @@ const cli = cac("crosshair");
 cli
   .command("run [serverCommand] [...serverArgs]", "Run your crosshair.config cases against an MCP server")
   .option("--strict", "Treat schema-lint warnings as failures (non-zero exit)")
-  .action((serverCommand: string | undefined, serverArgs: string[], options: { strict?: boolean }) =>
-    runCommand({ serverCommand, serverArgs, strict: options.strict }),
+  .option("--no-cache", "Bypass the response cache and force fresh model calls")
+  .action((serverCommand: string | undefined, serverArgs: string[], options: { strict?: boolean; cache?: boolean }) =>
+    runCommand({ serverCommand, serverArgs, strict: options.strict, cache: options.cache }),
   );
 
 cli.help();
