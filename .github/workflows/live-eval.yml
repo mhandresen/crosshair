@@ -1,0 +1,42 @@
+name: Live eval
+
+# Never on `pull_request` — that would expose the key to fork PRs. Only on pushes
+# to our own branches (where the secret is trusted) and manual dispatch.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      # Cache crosshair's response cache across runs so unchanged cases cost $0.
+      - uses: actions/cache@v4
+        with:
+          path: examples/basic-stdio-server/.crosshair
+          key: crosshair-cache-${{ hashFiles('examples/basic-stdio-server/crosshair.config.ts') }}
+
+      - name: Run behavioral suite
+        working-directory: examples/basic-stdio-server
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node ../../packages/cli/dist/bin.js run --junit
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crosshair-junit
+          path: examples/basic-stdio-server/crosshair-junit.xml

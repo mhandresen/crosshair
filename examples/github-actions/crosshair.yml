@@ -1,0 +1,36 @@
+name: MCP behavioral tests
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write        # required only for the annotation step below
+
+jobs:
+  crosshair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Crosshair
+        uses: your-org/crosshair/packages/action@v0
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        with:
+          args: --strict
+
+      # Annotation is delegated to a maintained, category-standard reporter —
+      # Crosshair produces the artifact, this turns it into PR check annotations.
+      - name: Annotate results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: MCP behavioral tests
+          path: crosshair-junit.xml
+          reporter: java-junit
