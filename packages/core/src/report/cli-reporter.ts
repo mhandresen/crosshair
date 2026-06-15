@@ -3,6 +3,7 @@ import type { ToolCall } from "../adapters";
 import type { CaseResult } from "../runner";
 import type { AssertionResult } from "../scoring";
 import type { LintFinding } from "../client";
+import type { SampledCaseResult } from "../runner";
 
 export interface ReportOptions {
   title?: string;
@@ -138,4 +139,44 @@ export function formatLint(findings: LintFinding[]): string {
     lines.push(`  ${pc.yellow("⚠")} ${pc.cyan(f.tool)} ${pc.dim(`[${f.rule}]`)} ${f.message}`);
   }
   return lines.join("\n");
+}
+
+export function formatSampledReport(results: SampledCaseResult[], options: ReportOptions = {}): string {
+  const passed = results.filter((r) => r.passed).length;
+  const failed = results.length - passed;
+  const lines: string[] = ["", header(results.length, options.title), ""];
+
+  for (const result of results) {
+    lines.push(sampledLine(result));
+    if (!result.passed) {
+      lines.push(...sampledFailureDetail(result));
+      lines.push("");
+    }
+  }
+
+  lines.push(summary(passed, failed), "");
+  return lines.join("\n");
+}
+
+function sampledLine(result: SampledCaseResult): string {
+  const rate = `${result.passes}/${result.samples}`;
+  const need = pc.dim(`(need ${result.threshold})`);
+  return result.passed
+    ? `  ${pc.green("✓")} ${pc.dim(result.name)}  ${pc.dim(rate)} ${need}`
+    : `  ${pc.red("✗")} ${pc.red(result.name)}  ${pc.yellow(rate)} ${need}`;
+}
+
+function sampledFailureDetail(result: SampledCaseResult): string[] {
+  // Surface the distinct failure reasons across samples, so a flaky case shows
+  // *what* the model did on the runs that missed — not just that it missed.
+  const reasons = new Map<string, number>();
+  for (const run of result.runs) {
+    if (run.passed) continue;
+    for (const assertion of run.assertions) {
+      if (!assertion.passed) reasons.set(assertion.message, (reasons.get(assertion.message) ?? 0) + 1);
+    }
+  }
+  return [...reasons.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([message, count]) => `${INDENT}${pc.dim(`${count}×`)} ${message}`);
 }

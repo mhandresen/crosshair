@@ -1,14 +1,15 @@
 import {
   AnthropicAdapter,
-  type CaseResult,
   type CrosshairConfig,
   connect,
   discover,
   formatLint,
-  formatReport,
+  formatSampledReport,
   lintTools,
   loadCrosshairConfig,
-  runCase,
+  resolvePolicy,
+  runSampledCase,
+  type SampledCaseResult,
 } from "@crosshair/core";
 import pc from "picocolors";
 
@@ -31,14 +32,14 @@ export async function runCommand(options: RunOptions): Promise<void> {
     if (lint) console.log(lint);
 
     const adapter = new AnthropicAdapter(config.model ? { model: config.model } : {});
-    const results: CaseResult[] = [];
+    const results: SampledCaseResult[] = [];
     for (const testCase of config.cases) {
-      results.push(await runCase(adapter, tools, testCase));
+      const policy = resolvePolicy(config.sampling, testCase.sampling);
+      results.push(await runSampledCase(adapter, tools, testCase, policy));
     }
 
-    console.log(formatReport(results, { title: adapter.model }));
+    console.log(formatSampledReport(results, { title: adapter.model }));
 
-    // Cases failing always fails the run; lint warnings fail only under --strict.
     const casesFailed = results.some((r) => !r.passed);
     const lintFailed = options.strict === true && findings.length > 0;
     process.exitCode = casesFailed || lintFailed ? 1 : 0;

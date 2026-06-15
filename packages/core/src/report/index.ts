@@ -1,1 +1,8 @@
-export { type Mismatch, type ReportOptions, diffSubset, formatLint, formatReport } from "./cli-reporter";
+export {
+  type Mismatch,
+  type ReportOptions,
+  diffSubset,
+  formatLint,
+  formatReport,
+  formatSampledReport,
+} from "./cli-reporter";

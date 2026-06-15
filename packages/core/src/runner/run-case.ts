@@ -7,6 +7,7 @@ export interface Case {
   prompt: string;
   system?: string;
   assertions: Assertion[];
+  sampling?: { samples?: number; threshold?: number };
 }
 
 export interface CaseResult {
