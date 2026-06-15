@@ -16,7 +16,9 @@ export async function lintCommand(options: LintOptions): Promise<void> {
     if (output) {
       console.log(output);
     } else {
-      console.log(`\nNo issues found across ${tools.length} tool${tools.length === 1 ? "" : "s"}.\n`);
+      console.log(
+        `\nNo issues found across ${tools.length} tool${tools.length === 1 ? "" : "s"}.\n`,
+      );
     }
 
     // Warnings only fail the run under --strict, mirroring `run`'s contract.

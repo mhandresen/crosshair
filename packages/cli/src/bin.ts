@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { VERSION } from "@crosshair/core";
 import { cac } from "cac";
-import { runCommand } from "./commands/run";
 import { lintCommand } from "./commands/lint";
+import { runCommand } from "./commands/run";
 
 const cli = cac("crosshair");
 
@@ -27,8 +27,8 @@ cli
         cache: options.cache,
         junit: options.junit,
       }),
-);
-  
+  );
+
 cli
   .command("lint", "Lint an MCP server's tool definitions (no model, no API key)")
   .allowUnknownOptions()
