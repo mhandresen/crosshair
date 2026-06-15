@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   callsNoTool,
   callsTool,
-  defineCase,
   type DiscoveredTool,
+  defineCase,
   expectTool,
   MockAdapter,
   runCase,
@@ -22,7 +22,9 @@ const statusCase = defineCase({
 
 describe("runCase", () => {
   it("passes when the model calls the expected tool", async () => {
-    const adapter = new MockAdapter({ respond: () => callsTool("get_order_status", { order_id: "ORD-1" }) });
+    const adapter = new MockAdapter({
+      respond: () => callsTool("get_order_status", { order_id: "ORD-1" }),
+    });
     const result = await runCase(adapter, tools, statusCase);
 
     expect(result.passed).toBe(true);

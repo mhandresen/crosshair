@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { callsTool, type CompletionRequest, type DiscoveredTool, MockAdapter } from "../src";
+import { type CompletionRequest, callsTool, type DiscoveredTool, MockAdapter } from "../src";
 
 const tools: DiscoveredTool[] = [
   { name: "search_products", inputSchema: { type: "object" } },

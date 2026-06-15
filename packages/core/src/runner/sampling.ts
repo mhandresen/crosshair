@@ -2,7 +2,7 @@ import type { CompletionRequest, CompletionResult, ModelAdapter } from "../adapt
 import { type ResponseCache, requestCacheKey } from "../cache";
 import type { DiscoveredTool } from "../client";
 import { DEFAULT_SAMPLES, DEFAULT_THRESHOLD } from "../config/schema";
-import { type Case, type CaseResult, buildRequest, scoreCompletion } from "./run-case";
+import { buildRequest, type Case, type CaseResult, scoreCompletion } from "./run-case";
 
 export interface SamplingPolicy {
   samples: number;
@@ -59,7 +59,7 @@ async function sampleCompletions(
   cache?: ResponseCache,
 ): Promise<{ completions: CompletionResult[]; cached: number }> {
   const key = cache ? requestCacheKey(adapter, request) : undefined;
-  const existing = cache && key ? cache.get(key) ?? [] : [];
+  const existing = cache && key ? (cache.get(key) ?? []) : [];
   const results = [...existing];
 
   // Only draw the shortfall — a cache with 3 draws and a request for 5 makes 2 calls.

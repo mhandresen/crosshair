@@ -1,9 +1,8 @@
 import pc from "picocolors";
 import type { ToolCall } from "../adapters";
-import type { CaseResult } from "../runner";
-import type { AssertionResult } from "../scoring";
 import type { LintFinding } from "../client";
-import type { SampledCaseResult } from "../runner";
+import type { CaseResult, SampledCaseResult } from "../runner";
+import type { AssertionResult } from "../scoring";
 import { aggregateFailures } from "./failures";
 
 export interface ReportOptions {
@@ -135,14 +134,23 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 export function formatLint(findings: LintFinding[]): string {
   if (findings.length === 0) return "";
-  const lines = ["", pc.bold(pc.yellow(`schema-lint · ${findings.length} warning${findings.length === 1 ? "" : "s"}`)), ""];
+  const lines = [
+    "",
+    pc.bold(
+      pc.yellow(`schema-lint · ${findings.length} warning${findings.length === 1 ? "" : "s"}`),
+    ),
+    "",
+  ];
   for (const f of findings) {
     lines.push(`  ${pc.yellow("⚠")} ${pc.cyan(f.tool)} ${pc.dim(`[${f.rule}]`)} ${f.message}`);
   }
   return lines.join("\n");
 }
 
-export function formatSampledReport(results: SampledCaseResult[], options: ReportOptions = {}): string {
+export function formatSampledReport(
+  results: SampledCaseResult[],
+  options: ReportOptions = {},
+): string {
   const passed = results.filter((r) => r.passed).length;
   const failed = results.length - passed;
   const lines: string[] = ["", header(results.length, options.title), ""];
@@ -168,5 +176,7 @@ function sampledLine(result: SampledCaseResult): string {
 }
 
 function sampledFailureDetail(result: SampledCaseResult): string[] {
-  return aggregateFailures(result).map(([message, count]) => `${INDENT}${pc.dim(`${count}×`)} ${message}`);
+  return aggregateFailures(result).map(
+    ([message, count]) => `${INDENT}${pc.dim(`${count}×`)} ${message}`,
+  );
 }

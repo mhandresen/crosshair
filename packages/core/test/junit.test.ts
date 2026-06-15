@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { type SampledCaseResult, formatJUnit } from "../src";
+import { formatJUnit, type SampledCaseResult } from "../src";
 
 function sampled(over: Partial<SampledCaseResult>): SampledCaseResult {
-  return { name: "case", passed: true, passes: 5, samples: 5, threshold: 4, cached: 0, runs: [], ...over };
+  return {
+    name: "case",
+    passed: true,
+    passes: 5,
+    samples: 5,
+    threshold: 4,
+    cached: 0,
+    runs: [],
+    ...over,
+  };
 }
 
 describe("formatJUnit", () => {
@@ -23,7 +32,9 @@ describe("formatJUnit", () => {
           passed: false,
           toolCalls: [],
           text: "",
-          assertions: [{ assertion: { kind: "tool", tool: "x" }, passed: false, message: "expected x, got y" }],
+          assertions: [
+            { assertion: { kind: "tool", tool: "x" }, passed: false, message: "expected x, got y" },
+          ],
         },
       ],
     });

@@ -12,7 +12,9 @@ describe("connect + discover", () => {
 
   beforeAll(async () => {
     if (!existsSync(serverEntry)) {
-      throw new Error(`Example server not built — run \`pnpm build\` first (expected ${serverEntry}).`);
+      throw new Error(
+        `Example server not built — run \`pnpm build\` first (expected ${serverEntry}).`,
+      );
     }
     connection = await connect({ command: process.execPath, args: [serverEntry] });
   });

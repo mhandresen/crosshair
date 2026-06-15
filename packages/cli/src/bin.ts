@@ -6,7 +6,10 @@ import { runCommand } from "./commands/run";
 const cli = cac("crosshair");
 
 cli
-  .command("run [serverCommand] [...serverArgs]", "Run your crosshair.config cases against an MCP server")
+  .command(
+    "run [serverCommand] [...serverArgs]",
+    "Run your crosshair.config cases against an MCP server",
+  )
   .option("--strict", "Treat schema-lint warnings as failures (non-zero exit)")
   .option("--no-cache", "Bypass the response cache and force fresh model calls")
   .option("--junit [file]", "Write a JUnit XML report (default: crosshair-junit.xml)")

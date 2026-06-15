@@ -20,19 +20,28 @@ function resultWith(
 
 describe("expectTool", () => {
   it("passes on the right tool", () => {
-    const [r] = scoreCase(resultWith({ name: "get_order_status" }), [expectTool("get_order_status")]);
+    const [r] = scoreCase(resultWith({ name: "get_order_status" }), [
+      expectTool("get_order_status"),
+    ]);
     expect(r?.passed).toBe(true);
   });
 
   it("matches a subset of arguments", () => {
-    const result = resultWith({ name: "get_order_status", arguments: { order_id: "ORD-1", locale: "en" } });
-    const [r] = scoreCase(result, [expectTool("get_order_status", { args: { order_id: "ORD-1" } })]);
+    const result = resultWith({
+      name: "get_order_status",
+      arguments: { order_id: "ORD-1", locale: "en" },
+    });
+    const [r] = scoreCase(result, [
+      expectTool("get_order_status", { args: { order_id: "ORD-1" } }),
+    ]);
     expect(r?.passed).toBe(true);
   });
 
   it("fails with a legible reason when an asserted argument differs", () => {
     const result = resultWith({ name: "get_order_status", arguments: { order_id: "ORD-2" } });
-    const [r] = scoreCase(result, [expectTool("get_order_status", { args: { order_id: "ORD-1" } })]);
+    const [r] = scoreCase(result, [
+      expectTool("get_order_status", { args: { order_id: "ORD-1" } }),
+    ]);
     expect(r?.passed).toBe(false);
     expect(r?.message).toContain("args mismatch");
   });

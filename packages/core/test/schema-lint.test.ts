@@ -34,7 +34,12 @@ describe("lintTools", () => {
 
   it("stays silent on a clean tool", () => {
     const findings = lintTools([
-      tool({ inputSchema: { type: "object", properties: { q: { type: "string", description: "the query" } } } }),
+      tool({
+        inputSchema: {
+          type: "object",
+          properties: { q: { type: "string", description: "the query" } },
+        },
+      }),
     ]);
     expect(findings).toHaveLength(0);
   });

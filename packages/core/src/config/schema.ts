@@ -49,7 +49,8 @@ export const configSchema = z
     const globalSamples = config.sampling?.samples ?? DEFAULT_SAMPLES;
     config.cases.forEach((testCase, i) => {
       const samples = testCase.sampling?.samples ?? config.sampling?.samples ?? DEFAULT_SAMPLES;
-      const threshold = testCase.sampling?.threshold ?? config.sampling?.threshold ?? DEFAULT_THRESHOLD;
+      const threshold =
+        testCase.sampling?.threshold ?? config.sampling?.threshold ?? DEFAULT_THRESHOLD;
       if (threshold > samples) {
         ctx.addIssue({
           code: "custom",

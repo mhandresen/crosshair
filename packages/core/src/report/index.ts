@@ -1,10 +1,10 @@
 export {
-  type Mismatch,
-  type ReportOptions,
   diffSubset,
   formatLint,
   formatReport,
   formatSampledReport,
+  type Mismatch,
+  type ReportOptions,
 } from "./cli-reporter";
 export { aggregateFailures } from "./failures";
-export { type JUnitOptions, formatJUnit } from "./junit";
+export { formatJUnit, type JUnitOptions } from "./junit";

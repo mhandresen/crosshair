@@ -43,7 +43,10 @@ export function matchesSubset(expected: unknown, actual: unknown): boolean {
     );
   }
   if (isPlainObject(expected)) {
-    return isPlainObject(actual) && Object.entries(expected).every(([k, v]) => matchesSubset(v, actual[k]));
+    return (
+      isPlainObject(actual) &&
+      Object.entries(expected).every(([k, v]) => matchesSubset(v, actual[k]))
+    );
   }
   return Object.is(expected, actual);
 }

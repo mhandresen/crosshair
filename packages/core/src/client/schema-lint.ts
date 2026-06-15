@@ -27,10 +27,24 @@ export function lintTools(tools: DiscoveredTool[]): LintFinding[] {
 function lintDescription(tool: DiscoveredTool): LintFinding[] {
   const description = tool.description?.trim() ?? "";
   if (description === "") {
-    return [finding("no-description", "warn", tool.name, "has no description — the model has only the name to go on")];
+    return [
+      finding(
+        "no-description",
+        "warn",
+        tool.name,
+        "has no description — the model has only the name to go on",
+      ),
+    ];
   }
   if (description.length < MIN_DESCRIPTION_LENGTH) {
-    return [finding("thin-description", "warn", tool.name, `description is only ${description.length} chars — likely too thin to disambiguate`)];
+    return [
+      finding(
+        "thin-description",
+        "warn",
+        tool.name,
+        `description is only ${description.length} chars — likely too thin to disambiguate`,
+      ),
+    ];
   }
   return [];
 }
@@ -42,11 +56,24 @@ function lintParameters(tool: DiscoveredTool): LintFinding[] {
   const findings: LintFinding[] = [];
   for (const [name, raw] of Object.entries(properties)) {
     const param = asRecord(raw) ?? {};
-    if (typeof param.type !== "string" && !Array.isArray(param.anyOf) && !Array.isArray(param.oneOf)) {
-      findings.push(finding("untyped-param", "warn", tool.name, `parameter "${name}" has no type — the model must guess its shape`));
+    if (
+      typeof param.type !== "string" &&
+      !Array.isArray(param.anyOf) &&
+      !Array.isArray(param.oneOf)
+    ) {
+      findings.push(
+        finding(
+          "untyped-param",
+          "warn",
+          tool.name,
+          `parameter "${name}" has no type — the model must guess its shape`,
+        ),
+      );
     }
     if (typeof param.description !== "string" || param.description.trim() === "") {
-      findings.push(finding("undescribed-param", "warn", tool.name, `parameter "${name}" has no description`));
+      findings.push(
+        finding("undescribed-param", "warn", tool.name, `parameter "${name}" has no description`),
+      );
     }
   }
   return findings;
@@ -67,7 +94,14 @@ function lintCollisions(tools: DiscoveredTool[]): LintFinding[] {
     if (names.length > 1) {
       for (const name of names) {
         const others = names.filter((n) => n !== name).join(", ");
-        findings.push(finding("duplicate-description", "warn", name, `shares an identical description with ${others} — the model cannot tell them apart`));
+        findings.push(
+          finding(
+            "duplicate-description",
+            "warn",
+            name,
+            `shares an identical description with ${others} — the model cannot tell them apart`,
+          ),
+        );
       }
     }
   }

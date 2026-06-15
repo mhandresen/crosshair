@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  callsTool,
   type CompletionResult,
+  callsTool,
   type DiscoveredTool,
   defineCase,
   expectTool,
@@ -28,7 +28,10 @@ function flakyAdapter(passOn: boolean[]): MockAdapter {
 
 describe("resolvePolicy", () => {
   it("prefers override, then global, then defaults", () => {
-    expect(resolvePolicy({ samples: 10, threshold: 8 }, { threshold: 9 })).toEqual({ samples: 10, threshold: 9 });
+    expect(resolvePolicy({ samples: 10, threshold: 8 }, { threshold: 9 })).toEqual({
+      samples: 10,
+      threshold: 9,
+    });
     expect(resolvePolicy(undefined, undefined)).toEqual({ samples: 5, threshold: 4 });
   });
 });

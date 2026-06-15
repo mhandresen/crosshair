@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  type DiscoveredTool,
-  MemoryResponseCache,
   callsTool,
+  type DiscoveredTool,
   defineCase,
   expectTool,
+  MemoryResponseCache,
   MockAdapter,
   runSampledCase,
 } from "../src";
@@ -28,11 +28,23 @@ describe("response cache", () => {
     const cache = new MemoryResponseCache();
     const { adapter, calls } = countingAdapter();
 
-    const first = await runSampledCase(adapter, tools, testCase, { samples: 5, threshold: 3 }, cache);
+    const first = await runSampledCase(
+      adapter,
+      tools,
+      testCase,
+      { samples: 5, threshold: 3 },
+      cache,
+    );
     expect(calls()).toBe(5);
     expect(first.cached).toBe(0);
 
-    const second = await runSampledCase(adapter, tools, testCase, { samples: 5, threshold: 3 }, cache);
+    const second = await runSampledCase(
+      adapter,
+      tools,
+      testCase,
+      { samples: 5, threshold: 3 },
+      cache,
+    );
     expect(calls()).toBe(5); // zero new calls
     expect(second.cached).toBe(5);
     expect(second.passed).toBe(true);
@@ -45,7 +57,9 @@ describe("response cache", () => {
     await runSampledCase(adapter, tools, testCase, { samples: 3, threshold: 2 }, cache);
     expect(calls()).toBe(3);
 
-    const changed: DiscoveredTool[] = [{ name: "x", description: "now described", inputSchema: { type: "object" } }];
+    const changed: DiscoveredTool[] = [
+      { name: "x", description: "now described", inputSchema: { type: "object" } },
+    ];
     await runSampledCase(adapter, changed, testCase, { samples: 3, threshold: 2 }, cache);
     expect(calls()).toBe(6); // changed tools → new key → fresh calls
   });

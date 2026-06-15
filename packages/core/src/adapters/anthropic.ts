@@ -39,7 +39,10 @@ export class AnthropicAdapter implements ModelAdapter {
     let text = "";
     for (const block of response.content) {
       if (block.type === "tool_use") {
-        toolCalls.push({ name: block.name, arguments: (block.input ?? {}) as Record<string, unknown> });
+        toolCalls.push({
+          name: block.name,
+          arguments: (block.input ?? {}) as Record<string, unknown>,
+        });
       } else if (block.type === "text") {
         text += block.text;
       }
