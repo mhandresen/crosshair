@@ -15,7 +15,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@crosshair/core": "workspace:*"
+    "@crosshair/core": "workspace:*",
+    "cac": "^7.0.0",
+    "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
