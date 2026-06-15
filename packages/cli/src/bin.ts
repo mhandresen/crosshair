@@ -6,8 +6,10 @@ import { runCommand } from "./commands/run";
 const cli = cac("crosshair");
 
 cli
-  .command("run <command> [...args]", "Run the built-in example case against an MCP server")
-  .action((command: string, args: string[]) => runCommand(command, args));
+  .command("run [serverCommand] [...serverArgs]", "Run your crosshair.config cases against an MCP server")
+  .action((serverCommand: string | undefined, serverArgs: string[]) =>
+    runCommand({ serverCommand, serverArgs }),
+  );
 
 cli.help();
 cli.version(VERSION);
