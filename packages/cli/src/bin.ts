@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 import { VERSION } from "@crosshair/core";
 import { cac } from "cac";
+import { initCommand } from "./commands/init";
 import { lintCommand } from "./commands/lint";
 import { runCommand } from "./commands/run";
-import { initCommand } from "./commands/init";
 
 const cli = cac("crosshair");
 
 cli
   .command("init", "Scaffold a crosshair.config.ts for your MCP server")
   .action(() => initCommand());
-
 
 cli
   .command(

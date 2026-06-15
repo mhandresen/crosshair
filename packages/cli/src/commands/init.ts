@@ -1,7 +1,7 @@
 import { existsSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { connect, discover } from "@crosshair/core";
 import * as p from "@clack/prompts";
+import { connect, discover } from "@crosshair/core";
 
 export async function initCommand(): Promise<void> {
   p.intro("crosshair init");
