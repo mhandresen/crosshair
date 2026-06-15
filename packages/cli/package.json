@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clack/prompts": "^1.5.1",
     "@crosshair/core": "workspace:*",
     "cac": "^7.0.0",
     "picocolors": "^1.1.1"
