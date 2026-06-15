@@ -14,12 +14,16 @@ import {
   runSampledCase,
 } from "@crosshair/core";
 import pc from "picocolors";
+import { formatJUnit } from "@crosshair/core";
+import { writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 export interface RunOptions {
   serverCommand?: string;
   serverArgs?: string[];
   strict?: boolean;
   cache?: boolean;
+  junit?: string | boolean;
 }
 
 export async function runCommand(options: RunOptions): Promise<void> {
@@ -49,6 +53,13 @@ export async function runCommand(options: RunOptions): Promise<void> {
 
     const casesFailed = results.some((r) => !r.passed);
     const lintFailed = options.strict === true && findings.length > 0;
+
+    const junitPath = options.junit === true ? "crosshair-junit.xml" : options.junit;
+    if (junitPath) {
+      const target = resolve(process.cwd(), junitPath);
+      writeFileSync(target, formatJUnit(results, { suiteName: adapter.model }));
+      console.log(pc.dim(`JUnit XML written to ${target}\n`));
+    }
     process.exitCode = casesFailed || lintFailed ? 1 : 0;
   } finally {
     await connection.close();

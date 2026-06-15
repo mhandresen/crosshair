@@ -4,6 +4,7 @@ import type { CaseResult } from "../runner";
 import type { AssertionResult } from "../scoring";
 import type { LintFinding } from "../client";
 import type { SampledCaseResult } from "../runner";
+import { aggregateFailures } from "./failures";
 
 export interface ReportOptions {
   title?: string;
@@ -167,16 +168,5 @@ function sampledLine(result: SampledCaseResult): string {
 }
 
 function sampledFailureDetail(result: SampledCaseResult): string[] {
-  // Surface the distinct failure reasons across samples, so a flaky case shows
-  // *what* the model did on the runs that missed — not just that it missed.
-  const reasons = new Map<string, number>();
-  for (const run of result.runs) {
-    if (run.passed) continue;
-    for (const assertion of run.assertions) {
-      if (!assertion.passed) reasons.set(assertion.message, (reasons.get(assertion.message) ?? 0) + 1);
-    }
-  }
-  return [...reasons.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([message, count]) => `${INDENT}${pc.dim(`${count}×`)} ${message}`);
+  return aggregateFailures(result).map(([message, count]) => `${INDENT}${pc.dim(`${count}×`)} ${message}`);
 }
