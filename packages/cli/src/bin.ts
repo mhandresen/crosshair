@@ -2,6 +2,7 @@
 import { VERSION } from "@crosshair/core";
 import { cac } from "cac";
 import { runCommand } from "./commands/run";
+import { lintCommand } from "./commands/lint";
 
 const cli = cac("crosshair");
 
@@ -26,7 +27,23 @@ cli
         cache: options.cache,
         junit: options.junit,
       }),
-  );
+);
+  
+cli
+  .command("lint", "Lint an MCP server's tool definitions (no model, no API key)")
+  .allowUnknownOptions()
+  .option("--strict", "Exit non-zero when any warnings are found")
+  .action((options: { strict?: boolean }) => {
+    const argv = process.argv.slice(2);
+    const start = argv.indexOf("lint") + 1;
+    const rest = argv.slice(start).filter((a) => a !== "--" && a !== "--strict");
+    const [serverCommand, ...serverArgs] = rest;
+    if (!serverCommand) {
+      console.error("Usage: crosshair lint [--strict] -- <server command>");
+      process.exit(1);
+    }
+    return lintCommand({ serverCommand, serverArgs, strict: options.strict });
+  });
 
 cli.help();
 cli.version(VERSION);
