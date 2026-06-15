@@ -34,6 +34,11 @@ const caseSchema = z.object({
   system: z.string().optional(),
   assertions: z.array(assertionSchema).min(1),
   sampling: samplingSchema.optional(),
+  // Demo/offline only: when running with the mock adapter, the tool this case
+  // should "call". Ignored by real adapters.
+  mockReply: z
+    .object({ tool: z.string(), args: z.record(z.string(), z.unknown()).optional() })
+    .optional(),
 });
 
 export const configSchema = z

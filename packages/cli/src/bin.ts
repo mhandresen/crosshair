@@ -19,11 +19,12 @@ cli
   .option("--strict", "Treat schema-lint warnings as failures (non-zero exit)")
   .option("--no-cache", "Bypass the response cache and force fresh model calls")
   .option("--junit [file]", "Write a JUnit XML report (default: crosshair-junit.xml)")
+  .option("--adapter <name>", "Adapter to use: anthropic (default) or mock") // ← registered?
   .action(
     (
       serverCommand: string | undefined,
       serverArgs: string[],
-      options: { strict?: boolean; cache?: boolean; junit?: string | boolean },
+      options: { strict?: boolean; cache?: boolean; junit?: string | boolean; adapter?: string }, // ← in the type?
     ) =>
       runCommand({
         serverCommand,
@@ -31,6 +32,7 @@ cli
         strict: options.strict,
         cache: options.cache,
         junit: options.junit,
+        adapter: options.adapter,
       }),
   );
 

@@ -8,6 +8,7 @@ export interface Case {
   system?: string;
   assertions: Assertion[];
   sampling?: { samples?: number; threshold?: number };
+  mockReply?: { tool: string; args?: Record<string, unknown> };
 }
 
 export interface CaseResult {

@@ -2,7 +2,10 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   AnthropicAdapter,
+  type CompletionResult,
   type CrosshairConfig,
+  callsNoTool,
+  callsTool,
   connect,
   discover,
   FileResponseCache,
@@ -11,6 +14,8 @@ import {
   formatSampledReport,
   lintTools,
   loadCrosshairConfig,
+  MockAdapter,
+  type ModelAdapter,
   type ResponseCache,
   resolvePolicy,
   runSampledCase,
@@ -24,6 +29,7 @@ export interface RunOptions {
   strict?: boolean;
   cache?: boolean;
   junit?: string | boolean;
+  adapter?: string;
 }
 
 export async function runCommand(options: RunOptions): Promise<void> {
@@ -40,13 +46,22 @@ export async function runCommand(options: RunOptions): Promise<void> {
     const lint = formatLint(findings);
     if (lint) console.log(lint);
 
-    const adapter = new AnthropicAdapter(config.model ? { model: config.model } : {});
+    const adapter: ModelAdapter =
+      options.adapter === "mock"
+        ? new MockAdapter({
+            respond: (req): CompletionResult => {
+              const prompt = req.messages.at(-1)?.content ?? "";
+              const match = config.cases.find((c) => c.prompt === prompt);
+              const reply = match?.mockReply;
+              return reply ? callsTool(reply.tool, reply.args) : callsNoTool();
+            },
+          })
+        : new AnthropicAdapter(config.model ? { model: config.model } : {});
     const results: SampledCaseResult[] = [];
     for (const testCase of config.cases) {
       const policy = resolvePolicy(config.sampling, testCase.sampling);
       results.push(await runSampledCase(adapter, tools, testCase, policy, cache));
     }
-
     console.log(formatSampledReport(results, { title: adapter.model }));
 
     const cachedTotal = results.reduce((n, r) => n + r.cached, 0);

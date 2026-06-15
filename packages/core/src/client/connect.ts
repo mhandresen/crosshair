@@ -9,6 +9,7 @@ export interface ServerConfig {
   args?: string[];
   env?: Record<string, string>;
   cwd?: string;
+  stderr?: "inherit" | "ignore";
 }
 
 export interface ConnectedClient {
@@ -26,7 +27,7 @@ export async function connect(config: ServerConfig): Promise<ConnectedClient> {
     env: config.env ? { ...getDefaultEnvironment(), ...config.env } : getDefaultEnvironment(),
     // Pipe the child's stderr through; a server that crashes on boot should be
     // visible, not surface as an opaque connection timeout.
-    stderr: "inherit",
+    stderr: config.stderr ?? "ignore",
   });
 
   const client = new Client({ name: "crosshair", version: "0.0.0" });
