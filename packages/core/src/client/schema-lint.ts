@@ -9,7 +9,7 @@ export interface LintFinding {
   message: string;
 }
 
-const MIN_DESCRIPTION_LENGTH = 12;
+const MIN_DESCRIPTION_LENGTH = 10;
 
 // Each rule inspects the tool surface the *model* sees and flags what tends to
 // cause misselection. Pure and offline — no model, no network. Rules are small
@@ -50,17 +50,20 @@ function lintDescription(tool: DiscoveredTool): LintFinding[] {
 }
 
 function lintParameters(tool: DiscoveredTool): LintFinding[] {
-  const properties = asRecord(tool.inputSchema.properties);
+  const schema = tool.inputSchema;
+  const properties = asRecord(schema.properties);
   if (!properties) return [];
 
+  const required = new Set(Array.isArray(schema.required) ? schema.required.map(String) : []);
   const findings: LintFinding[] = [];
+
   for (const [name, raw] of Object.entries(properties)) {
     const param = asRecord(raw) ?? {};
-    if (
-      typeof param.type !== "string" &&
-      !Array.isArray(param.anyOf) &&
-      !Array.isArray(param.oneOf)
-    ) {
+    const hasType =
+      typeof param.type === "string" || Array.isArray(param.anyOf) || Array.isArray(param.oneOf);
+    const description = typeof param.description === "string" ? param.description.trim() : "";
+
+    if (!hasType) {
       findings.push(
         finding(
           "untyped-param",
@@ -70,12 +73,37 @@ function lintParameters(tool: DiscoveredTool): LintFinding[] {
         ),
       );
     }
-    if (typeof param.description !== "string" || param.description.trim() === "") {
+
+    if (description === "") {
+      // A required param with no description is the highest-signal gap: the model
+      // is forced to call the tool and fill an argument it has no guidance on.
+      // This is the exact friction observed on real servers (e.g. git's repo_path).
+      if (required.has(name)) {
+        findings.push(
+          finding(
+            "required-undescribed-param",
+            "warn",
+            tool.name,
+            `required parameter "${name}" has no description — the model must supply it blind`,
+          ),
+        );
+      } else {
+        findings.push(
+          finding("undescribed-param", "warn", tool.name, `parameter "${name}" has no description`),
+        );
+      }
+    } else if (description.length < MIN_DESCRIPTION_LENGTH) {
       findings.push(
-        finding("undescribed-param", "warn", tool.name, `parameter "${name}" has no description`),
+        finding(
+          "thin-param-description",
+          "warn",
+          tool.name,
+          `parameter "${name}" has a very short description ("${description}") — likely too thin to disambiguate`,
+        ),
       );
     }
   }
+
   return findings;
 }
 

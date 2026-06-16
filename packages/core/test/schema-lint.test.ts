@@ -33,14 +33,43 @@ describe("lintTools", () => {
   });
 
   it("stays silent on a clean tool", () => {
-    const findings = lintTools([
-      tool({
-        inputSchema: {
-          type: "object",
-          properties: { q: { type: "string", description: "the query" } },
-        },
-      }),
-    ]);
-    expect(findings).toHaveLength(0);
-  });
+  const findings = lintTools([
+    tool({
+      inputSchema: {
+        type: "object",
+        properties: { q: { type: "string", description: "the search query text to match against" } },
+      },
+    }),
+  ]);
+  expect(findings).toHaveLength(0);
+});
+});
+
+it("flags a required undescribed param distinctly from an optional one", () => {
+  const findings = lintTools([
+    tool({
+      name: "a",
+      inputSchema: {
+        type: "object",
+        properties: { id: { type: "string" }, note: { type: "string" } },
+        required: ["id"],
+      },
+    }),
+  ]);
+  const rules = findings.map((f) => f.rule);
+  expect(rules).toContain("required-undescribed-param"); // id is required + undescribed
+  expect(rules).toContain("undescribed-param"); // note is optional + undescribed
+});
+
+it("flags a description that exists but is too thin", () => {
+  const findings = lintTools([
+    tool({
+      name: "a",
+      inputSchema: {
+        type: "object",
+        properties: { path: { type: "string", description: "the path" } },
+      },
+    }),
+  ]);
+  expect(findings.some((f) => f.rule === "thin-param-description")).toBe(true);
 });
