@@ -1,5 +1,11 @@
 # @crosshair/core
 
+## 0.1.1
+
+### Patch Changes
+
+- ca3771f: Add keywords and descriptions for npm discoverability
+
 ## 0.1.0
 
 ### Minor Changes
