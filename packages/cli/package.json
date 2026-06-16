@@ -1,8 +1,11 @@
 {
-  "name": "crosshair",
+  "name": "@crosshair/cli",
   "version": "0.0.0",
   "type": "module",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "crosshair": "./dist/bin.js"
   },

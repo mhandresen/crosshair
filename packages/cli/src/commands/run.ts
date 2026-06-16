@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { resolve, relative } from "node:path";
+import { relative, resolve } from "node:path";
 import {
   AnthropicAdapter,
   type CompletionResult,

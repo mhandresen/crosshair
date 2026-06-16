@@ -1,6 +1,6 @@
 # Crosshair
 
-![Crosshair linting an MCP server, catching a tool-selection regression, and passing after the fix](./demo.gif)
+![Crosshair demo](./demo.gif)
 
 **A quality gate for your MCP server's tool definitions.**
 
@@ -13,7 +13,7 @@ Crosshair does. Point it at any MCP server and it inspects the tools the way the
 No config, no API key, no model calls:
 
 ```bash
-npx crosshair lint -- npx -y @modelcontextprotocol/server-filesystem /tmp
+npx @crosshair/cli lint -- npx -y @modelcontextprotocol/server-filesystem /tmp
 ```
 
 ```
@@ -27,7 +27,7 @@ schema-lint · 18 warnings
 That's a real result against a real, widely-used server. Try it on your own:
 
 ```bash
-npx crosshair lint -- <the command that starts your server>
+npx @crosshair/cli lint -- <the command that starts your server>
 ```
 
 Everything after `--` is your server's launch command, passed through untouched.
