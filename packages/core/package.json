@@ -6,6 +6,18 @@
   "publishConfig": {
     "access": "public"
   },
+  "description": "Core library for Crosshair — testing MCP server tool definitions and selection behavior.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "llm",
+    "ai",
+    "testing",
+    "tool-calling",
+    "anthropic",
+    "claude",
+    "evals"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

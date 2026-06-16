@@ -6,6 +6,19 @@
   "publishConfig": {
     "access": "public"
   },
+  "description": "A quality gate for your MCP server's tool definitions — lint and behavioral tests.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "llm",
+    "ai",
+    "testing",
+    "cli",
+    "tool-calling",
+    "anthropic",
+    "claude",
+    "evals"
+  ],
   "bin": {
     "crosshair": "./dist/bin.js"
   },
