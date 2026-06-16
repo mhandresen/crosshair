@@ -25,6 +25,9 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
+      - name: Upgrade npm for trusted publishing (needs >= 11.5.1)
+        run: npm install -g npm@latest
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
