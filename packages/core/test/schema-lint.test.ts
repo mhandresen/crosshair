@@ -33,16 +33,18 @@ describe("lintTools", () => {
   });
 
   it("stays silent on a clean tool", () => {
-  const findings = lintTools([
-    tool({
-      inputSchema: {
-        type: "object",
-        properties: { q: { type: "string", description: "the search query text to match against" } },
-      },
-    }),
-  ]);
-  expect(findings).toHaveLength(0);
-});
+    const findings = lintTools([
+      tool({
+        inputSchema: {
+          type: "object",
+          properties: {
+            q: { type: "string", description: "the search query text to match against" },
+          },
+        },
+      }),
+    ]);
+    expect(findings).toHaveLength(0);
+  });
 });
 
 it("flags a required undescribed param distinctly from an optional one", () => {
