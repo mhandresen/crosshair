@@ -1,5 +1,7 @@
 # Crosshair
 
+![Crosshair linting an MCP server, catching a tool-selection regression, and passing after the fix](./demo.gif)
+
 **A quality gate for your MCP server's tool definitions.**
 
 Your MCP server's tools are an API — but the consumer is a language model, not a programmer. The model only ever sees the tool names, descriptions, and parameter schemas you ship. If a parameter has no description, or two tools read alike, the model has to guess. Nothing in a normal test suite checks that surface.

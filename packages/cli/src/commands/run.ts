@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, relative } from "node:path";
 import {
   AnthropicAdapter,
   type CompletionResult,
@@ -34,7 +34,7 @@ export interface RunOptions {
 
 export async function runCommand(options: RunOptions): Promise<void> {
   const { config, filepath } = await loadCrosshairConfig();
-  console.log(pc.dim(`config: ${filepath}`));
+  console.log(pc.dim(`config: ${relative(process.cwd(), filepath)}`));
 
   const cache: ResponseCache | undefined =
     options.cache === false ? undefined : new FileResponseCache();
