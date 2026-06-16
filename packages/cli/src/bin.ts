@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { VERSION } from "@crosshair/core";
 import { cac } from "cac";
+import { driftCommand } from "./commands/drift";
 import { initCommand } from "./commands/init";
 import { lintCommand } from "./commands/lint";
 import { runCommand } from "./commands/run";
@@ -51,6 +52,11 @@ cli
     }
     return lintCommand({ serverCommand, serverArgs, strict: options.strict });
   });
+
+cli
+  .command("drift", "Compare tool-selection behavior across multiple models")
+  .option("--no-cache", "Bypass the response cache")
+  .action((options: { cache?: boolean }) => driftCommand({ cache: options.cache }));
 
 cli.help();
 cli.version(VERSION);

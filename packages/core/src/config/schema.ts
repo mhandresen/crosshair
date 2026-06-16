@@ -47,6 +47,7 @@ export const configSchema = z
     model: z.string().optional(),
     sampling: samplingSchema.optional(),
     cases: z.array(caseSchema).min(1),
+    models: z.array(z.string()).min(2).optional(),
   })
   .superRefine((config, ctx) => {
     // Threshold can't exceed samples — a case that can never pass is a config bug,
